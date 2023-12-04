@@ -5754,60 +5754,82 @@
             },
             {
               key: "toggleChapter",
-              value: function (t, e) {
-                e =
-                  void 0 !== e
-                    ? e
+              value: function (t, forceOpen) {
+                var isOpen =
+                  forceOpen !== undefined
+                    ? forceOpen
                     : !t.classList.contains(
                         "h5p-interactive-book-navigation-closed"
                       );
-                var r = t.querySelector(
-                    ".h5p-interactive-book-navigation-sectionlist"
-                  ),
-                  n = t.getElementsByClassName(
-                    "h5p-interactive-book-navigation-chapter-accordion"
-                  )[0];
-                t
-                  .querySelector(
-                    ".h5p-interactive-book-navigation-chapter-button"
-                  )
-                  .setAttribute("aria-expanded", (!e).toString()),
-                  !0 === e
-                    ? (t.classList.add(
-                        "h5p-interactive-book-navigation-closed"
-                      ),
-                      n &&
-                        (n.classList.remove("icon-expanded"),
-                        n.classList.add("icon-collapsed"),
-                        r &&
-                          (r.setAttribute("aria-hidden", !0),
-                          r.setAttribute("tabindex", "-1"))))
-                    : (t.classList.remove(
-                        "h5p-interactive-book-navigation-closed"
-                      ),
-                      n &&
-                        (n.classList.remove("icon-collapsed"),
-                        n.classList.add("icon-expanded"),
-                        r &&
-                          (r.removeAttribute("aria-hidden"),
-                          r.removeAttribute("tabindex"))));
+
+                var sectionList = t.querySelector(
+                  ".h5p-interactive-book-navigation-sectionlist"
+                );
+                var accordionIcon = t.getElementsByClassName(
+                  "h5p-interactive-book-navigation-chapter-accordion"
+                )[0];
+
+                t.querySelector(
+                  ".h5p-interactive-book-navigation-chapter-button"
+                ).setAttribute("aria-expanded", (!isOpen).toString());
+
+                if (isOpen) {
+                  // Fecha
+                  t.classList.add("h5p-interactive-book-navigation-closed");
+
+                  if (accordionIcon) {
+                    // Atualiza o ícone
+                    accordionIcon.classList.remove("icon-expanded");
+                    accordionIcon.classList.add("icon-collapsed");
+                  }
+
+                  if (sectionList) {
+                    // Esconde a lista de seções
+                    sectionList.setAttribute("aria-hidden", true);
+                    sectionList.setAttribute("tabindex", "-1");
+                  }
+                } else {
+                  // Abre
+                  t.classList.remove("h5p-interactive-book-navigation-closed");
+
+                  if (accordionIcon) {
+                    // Atualiza o ícone
+                    accordionIcon.classList.remove("icon-collapsed");
+                    accordionIcon.classList.add("icon-expanded");
+                  }
+
+                  if (sectionList) {
+                    // Mostra a lista de seções
+                    sectionList.removeAttribute("aria-hidden");
+                    sectionList.removeAttribute("tabindex");
+                  }
+                }
               },
             },
             {
               key: "redirectHandler",
               value: function (t) {
-                var e = this;
-                if (
-                  (this.chapterNodes.forEach(function (r, n) {
-                    e.toggleChapter(r, n !== t);
-                  }),
-                  this.parent.trigger("resize"),
-                  t !== this.focusedChapter)
-                ) {
-                  var r = this.chapterNodes[t].querySelector(
+                var self = this;
+
+                // Fecha todos os capítulos, exceto o capítulo atual (index === t)
+                this.chapterNodes.forEach(function (chapterNode, index) {
+                  if (index !== t) {
+                    self.toggleChapter(chapterNode, index !== t);
+                  }
+                });
+
+                // Atualiza o tamanho (resize) após a mudança do capítulo
+                this.parent.trigger("resize");
+
+                // Se o capítulo atual (t) não for o capítulo focado anteriormente
+                if (t !== this.focusedChapter) {
+                  // Encontra o botão do capítulo no capítulo atual
+                  var chapterButton = this.chapterNodes[t].querySelector(
                     ".h5p-interactive-book-navigation-chapter-button"
                   );
-                  this.setFocusToItem(r, t, !0);
+
+                  // Define o foco no botão do capítulo
+                  this.setFocusToItem(chapterButton, t, true);
                 }
               },
             },
@@ -5947,23 +5969,26 @@
                       };
                       r.parent.trigger("newChapter", o);
                     }
-                    n &&
-                      (r.toggleChapter(t.currentTarget.parentElement),
-                      r.parent.trigger("resize"));
+                    if (n) {
+                      r.toggleChapter(t.currentTarget.parentElement);
+                      r.parent.trigger("resize");
+                    }
                   }),
-                  u.appendChild(i),
-                  u.appendChild(s),
-                  u.appendChild(c),
-                  n.appendChild(u),
-                  this.parent.activeChapter === e
-                    ? n
-                        .querySelector(
-                          ".h5p-interactive-book-navigation-chapter-button"
-                        )
-                        .classList.add(
-                          "h5p-interactive-book-navigation-current"
-                        )
-                    : this.toggleChapter(n, !0);
+                  u.appendChild(i);
+                u.appendChild(s);
+                u.appendChild(c);
+                n.appendChild(u);
+
+                if (this.parent.activeChapter === e) {
+                  var chapterButton = n.querySelector(
+                    ".h5p-interactive-book-navigation-chapter-button"
+                  );
+                  chapterButton.classList.add(
+                    "h5p-interactive-book-navigation-current"
+                  );
+                } else {
+                  this.toggleChapter(n, true);
+                }
                 var l = document.createElement("ul");
                 l.classList.add("h5p-interactive-book-navigation-sectionlist"),
                   (l.id = a);
@@ -5979,7 +6004,6 @@
                     var f =
                       this.parent.params.chapters[e].params.content[h].content;
                     if ("H5P.AdvancedText" === f.library.split(" ")[0]) {
-                      console.log("text");
                       var v = document.createElement("div");
                       v.innerHTML = f.params.text;
                       for (
@@ -5992,7 +6016,6 @@
                         p.push(y), l.appendChild(y);
                       }
                     } else if ("H5P.TextEditor" === f.library.split(" ")[0]) {
-                      console.log("textEditor");
                       var v = document.createElement("div");
                       v.innerHTML = f.params.text;
                       for (
