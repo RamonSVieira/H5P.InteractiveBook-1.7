@@ -6015,17 +6015,28 @@
                           y = this.createSectionLink(e, h, g.textContent, b);
                         p.push(y), l.appendChild(y);
                       }
-                    } else if ("H5P.TextEditor" === f.library.split(" ")[0]) {
+                    } else if ("H5P.AdvancedText" === f.library.split(" ")[0] || "H5P.TextEditor" === f.library.split(" ")[0]) {
                       var v = document.createElement("div");
                       v.innerHTML = f.params.text;
-                      for (
-                        var m = v.querySelectorAll("h2, h3"), b = 0;
-                        b < m.length;
-                        b++
-                      ) {
+                      for (var m = v.querySelectorAll("h1, h2, h3, h4"), b = 0; b < m.length; b++) {
                         var g = m[b],
-                          y = this.createSectionLink(e, h, g.textContent, b);
-                        p.push(y), l.appendChild(y);
+                            y = this.createSectionLink(e, h, g.textContent, b);
+                        
+                        p.push(y);
+                        l.appendChild(y);
+                    
+                        if (g.tagName.toLowerCase() === 'h1') {
+                          y.classList.add('titulo_1');
+                        }
+                        if (g.tagName.toLowerCase() === 'h2') {
+                          y.classList.add('titulo_2');
+                        }
+                        if (g.tagName.toLowerCase() === 'h3') {
+                          y.classList.add('titulo_3');
+                        }
+                        if (g.tagName.toLowerCase() === 'h4') {
+                          y.classList.add('titulo_4');
+                        }
                       }
                     }
                   }
