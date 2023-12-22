@@ -5811,24 +5811,17 @@
               value: function (t) {
                 var self = this;
 
-                // Fecha todos os capítulos, exceto o capítulo atual (index === t)
+                // Fecha os outros capítulos menos o que foi clicado
                 this.chapterNodes.forEach(function (chapterNode, index) {
                   if (index !== t) {
                     self.toggleChapter(chapterNode, index !== t);
                   }
                 });
-
-                // Atualiza o tamanho (resize) após a mudança do capítulo
                 this.parent.trigger("resize");
-
-                // Se o capítulo atual (t) não for o capítulo focado anteriormente
                 if (t !== this.focusedChapter) {
-                  // Encontra o botão do capítulo no capítulo atual
                   var chapterButton = this.chapterNodes[t].querySelector(
                     ".h5p-interactive-book-navigation-chapter-button"
                   );
-
-                  // Define o foco no botão do capítulo
                   this.setFocusToItem(chapterButton, t, true);
                 }
               },
@@ -6015,27 +6008,35 @@
                           y = this.createSectionLink(e, h, g.textContent, b);
                         p.push(y), l.appendChild(y);
                       }
-                    } else if ("H5P.AdvancedText" === f.library.split(" ")[0] || "H5P.TextEditor" === f.library.split(" ")[0]) {
+                    } else if (
+                      "H5P.AdvancedText" === f.library.split(" ")[0] ||
+                      "H5P.TextEditor" === f.library.split(" ")[0]
+                    ) {
                       var v = document.createElement("div");
                       v.innerHTML = f.params.text;
-                      for (var m = v.querySelectorAll("h1, h2, h3, h4"), b = 0; b < m.length; b++) {
+                      for (
+                        var m = v.querySelectorAll("h1, h2, h3, h4"), b = 0;
+                        b < m.length;
+                        b++
+                      ) {
                         var g = m[b],
-                            y = this.createSectionLink(e, h, g.textContent, b);
-                        
+                          y = this.createSectionLink(e, h, g.textContent, b);
+
                         p.push(y);
                         l.appendChild(y);
-                    
-                        if (g.tagName.toLowerCase() === 'h1') {
-                          y.classList.add('titulo_1');
+
+                        // Responsável por inserir os subtítulo no menu lateral
+                        if (g.tagName.toLowerCase() === "h1") {
+                          y.classList.add("titulo_1");
                         }
-                        if (g.tagName.toLowerCase() === 'h2') {
-                          y.classList.add('titulo_2');
+                        if (g.tagName.toLowerCase() === "h2") {
+                          y.classList.add("titulo_2");
                         }
-                        if (g.tagName.toLowerCase() === 'h3') {
-                          y.classList.add('titulo_3');
+                        if (g.tagName.toLowerCase() === "h3") {
+                          y.classList.add("titulo_3");
                         }
-                        if (g.tagName.toLowerCase() === 'h4') {
-                          y.classList.add('titulo_4');
+                        if (g.tagName.toLowerCase() === "h4") {
+                          y.classList.add("titulo_4");
                         }
                       }
                     }
